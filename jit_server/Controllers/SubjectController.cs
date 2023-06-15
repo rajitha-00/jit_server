@@ -2,22 +2,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace jit_server.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class StudentController : Controller
+    public class SubjectController : Controller
     {
         private LmsJitContext db = new LmsJitContext();
 
 
         [HttpGet]
-        public async Task<String> getAllStudents()
+        public async Task<String> getAllSubjects()
         {
             try
             {
-                List<Student> students = await db.Students.ToListAsync();
-                return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = students });
+                List<Subject> subjects = await db.Subjects.ToListAsync();
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = subjects });
             }
             catch (Exception ex)
             {
@@ -31,8 +32,8 @@ namespace jit_server.Controllers
             bool success = false;
             try
             {
-                Student std = await db.Students.SingleAsync(S => S.Id == id);
-                if (std != null)
+                Subject sbjct = await db.Subjects.SingleAsync(S => S.Id == id);
+                if (sbjct != null)
                 {
                     success = true;
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new
@@ -40,15 +41,9 @@ namespace jit_server.Controllers
                         success = success,
                         data = new
                         {
-                            Id = std.Id,
-                            FirstName = std.FirstName,
-                            LastName = std.LastName,
-                            ContactPerson = std.ContactPerson,
-                            ContactNumber = std.ContactNumber,
-                            Email = std.Email,
-                            DateOfBirth = std.DateOfBirth,
-                            Age = std.Age,
-                            ClassId = std.ClassId
+                            Id = sbjct.Id,
+                            SubjectName = sbjct.SubjectName
+
                         }
                     });
                 }
@@ -61,23 +56,17 @@ namespace jit_server.Controllers
         }
 
         [HttpPost]
-        public async Task<String> create(StudentModel std)
+        public async Task<String> create(SubjectModel sbjct)
         {
             try
             {
 
-                Student newStd = new Student()
+                Subject newStd = new Subject()
                 {
-                    FirstName = std.FirstName,
-                    LastName = std.LastName,
-                    ContactPerson = std.ContactPerson,
-                    ContactNumber = std.ContactNumber,
-                    Email = std.Email,
-                    DateOfBirth = std.DateOfBirth,
-                    Age = std.Age,
-                    ClassId = std.ClassId
+                    SubjectName = sbjct.SubjectName
+
                 };
-                db.Students.Add(newStd);
+                db.Subjects.Add(newStd);
                 await db.SaveChangesAsync();
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = newStd });
 
@@ -86,10 +75,11 @@ namespace jit_server.Controllers
         }
 
         [HttpPut]
-        public async Task<String> update(StudentModel std) {
-            Student existingStudent = await db.Students.FindAsync(std.Id);
+        public async Task<String> update(StudentModel sbjct)
+        {
+            Subject existingSubject = await db.Subjects.FindAsync(sbjct.Id);
 
-            if (existingStudent != null)
+            if (existingSubject != null)
             {
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, data = "Not Found" });
             }
@@ -97,29 +87,26 @@ namespace jit_server.Controllers
             {
                 try
                 {
-                    Student newStd = new Student()
+                    Subject newStd = new Subject()
                     {
-                        FirstName = std.FirstName,
-                        LastName = std.LastName,
-                        ContactPerson = std.ContactPerson,
-                        ContactNumber = std.ContactNumber,
-                        Email = std.Email,
-                        DateOfBirth = std.DateOfBirth,
-                        Age = std.Age,
-                        ClassId = std.ClassId
+                        SubjectName = sbjct.SubjectName
+
                     };
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = newStd });
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, data = ex.Message });
                 }
             }
         }
 
         [HttpDelete]
-        public async Task<String> delete(int? id) {
-            Student existingStudent = await db.Students.FindAsync(id);
+        public async Task<String> delete(int? id)
+        {
+            Subject existingSubject = await db.Subjects.FindAsync(id);
 
-            if (existingStudent != null)
+            if (existingSubject != null)
             {
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, data = "Not Found" });
             }
@@ -127,7 +114,7 @@ namespace jit_server.Controllers
             {
                 try
                 {
-                   db.Students.Remove(existingStudent);
+                    db.Subjects.Remove(existingSubject);
                     await db.SaveChangesAsync();
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = "Delete Success" });
                 }
@@ -140,26 +127,11 @@ namespace jit_server.Controllers
         }
     }
 
-    public  class StudentModel
+    public class SubjectModel
     {
-        internal string SubjectName;
-
         public int Id { get; set; }
 
-        public string FirstName { get; set; }
+        public string SubjectName { get; set; }
 
-        public string LastName { get; set; }
-
-        public string ContactPerson { get; set; }
-
-        public int ContactNumber { get; set; }
-
-        public string Email { get; set; }
-
-        public DateTime DateOfBirth { get; set; }
-
-        public int Age { get; set; }
-
-        public int ClassId { get; set; }
     }
 }

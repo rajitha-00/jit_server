@@ -6,18 +6,18 @@ namespace jit_server.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class StudentController : Controller
+    public class ClassroomController : Controller
     {
         private LmsJitContext db = new LmsJitContext();
 
 
         [HttpGet]
-        public async Task<String> getAllStudents()
+        public async Task<String> getAllClassrooms()
         {
             try
             {
-                List<Student> students = await db.Students.ToListAsync();
-                return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = students });
+                List<Classroom> classrooms = await db.Classrooms.ToListAsync();
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = classrooms });
             }
             catch (Exception ex)
             {
@@ -26,13 +26,13 @@ namespace jit_server.Controllers
         }
 
         [HttpGet]
-        public async Task<String> getStudentById(int? id)
+        public async Task<String> getClassrromById(int? id)
         {
             bool success = false;
             try
             {
-                Student std = await db.Students.SingleAsync(S => S.Id == id);
-                if (std != null)
+                Classroom clarm = await db.Classrooms.SingleAsync(S => S.Id == id);
+                if (clarm != null)
                 {
                     success = true;
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new
@@ -40,15 +40,9 @@ namespace jit_server.Controllers
                         success = success,
                         data = new
                         {
-                            Id = std.Id,
-                            FirstName = std.FirstName,
-                            LastName = std.LastName,
-                            ContactPerson = std.ContactPerson,
-                            ContactNumber = std.ContactNumber,
-                            Email = std.Email,
-                            DateOfBirth = std.DateOfBirth,
-                            Age = std.Age,
-                            ClassId = std.ClassId
+                            Id = clarm.Id,
+                            ClassroomName = clarm.ClassroomName
+
                         }
                     });
                 }
@@ -61,23 +55,17 @@ namespace jit_server.Controllers
         }
 
         [HttpPost]
-        public async Task<String> create(StudentModel std)
+        public async Task<String> create(ClassroomModel clarm)
         {
             try
             {
 
-                Student newStd = new Student()
+                Classroom newStd = new Classroom()
                 {
-                    FirstName = std.FirstName,
-                    LastName = std.LastName,
-                    ContactPerson = std.ContactPerson,
-                    ContactNumber = std.ContactNumber,
-                    Email = std.Email,
-                    DateOfBirth = std.DateOfBirth,
-                    Age = std.Age,
-                    ClassId = std.ClassId
+                    ClassroomName = clarm.ClassroomName
+
                 };
-                db.Students.Add(newStd);
+                db.Classrooms.Add(newStd);
                 await db.SaveChangesAsync();
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = newStd });
 
@@ -86,10 +74,11 @@ namespace jit_server.Controllers
         }
 
         [HttpPut]
-        public async Task<String> update(StudentModel std) {
-            Student existingStudent = await db.Students.FindAsync(std.Id);
+        public async Task<String> update(ClassroomModel clarm)
+        {
+            Classroom existingClassroom = await db.Classrooms.FindAsync(clarm.Id);
 
-            if (existingStudent != null)
+            if (existingClassroom != null)
             {
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, data = "Not Found" });
             }
@@ -97,29 +86,26 @@ namespace jit_server.Controllers
             {
                 try
                 {
-                    Student newStd = new Student()
+                    Classroom newStd = new Classroom()
                     {
-                        FirstName = std.FirstName,
-                        LastName = std.LastName,
-                        ContactPerson = std.ContactPerson,
-                        ContactNumber = std.ContactNumber,
-                        Email = std.Email,
-                        DateOfBirth = std.DateOfBirth,
-                        Age = std.Age,
-                        ClassId = std.ClassId
+                        ClassroomName = clarm.ClassroomName
+
                     };
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = newStd });
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, data = ex.Message });
                 }
             }
         }
 
         [HttpDelete]
-        public async Task<String> delete(int? id) {
-            Student existingStudent = await db.Students.FindAsync(id);
+        public async Task<String> delete(int? id)
+        {
+            Classroom existingClassroom = await db.Classrooms.FindAsync(id);
 
-            if (existingStudent != null)
+            if (existingClassroom != null)
             {
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, data = "Not Found" });
             }
@@ -127,7 +113,7 @@ namespace jit_server.Controllers
             {
                 try
                 {
-                   db.Students.Remove(existingStudent);
+                    db.Classrooms.Remove(existingClassroom);
                     await db.SaveChangesAsync();
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = true, data = "Delete Success" });
                 }
@@ -140,26 +126,13 @@ namespace jit_server.Controllers
         }
     }
 
-    public  class StudentModel
-    {
-        internal string SubjectName;
 
+
+    public class ClassroomModel
+    {
         public int Id { get; set; }
 
-        public string FirstName { get; set; }
+        public string ClassroomName { get; set; }
 
-        public string LastName { get; set; }
-
-        public string ContactPerson { get; set; }
-
-        public int ContactNumber { get; set; }
-
-        public string Email { get; set; }
-
-        public DateTime DateOfBirth { get; set; }
-
-        public int Age { get; set; }
-
-        public int ClassId { get; set; }
     }
 }
